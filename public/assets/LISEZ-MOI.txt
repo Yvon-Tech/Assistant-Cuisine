@@ -1,0 +1,2 @@
+Place ici ton fichier audio, nomme exactement : sonnerie.mp3
+(Si le fichier est absent, l'appli joue un simple bip à la place.)

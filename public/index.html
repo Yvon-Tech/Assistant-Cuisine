@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#232C63">
+  <title>Assistant Cuisine IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Alarme globale (fin de chronomètre) -->
+  <div id="alarm" class="alarm" role="alert" hidden>
+    <p id="alarmText">Minuteur terminé</p>
+    <button type="button" class="btn btn-light" data-act="stop-ring">🔇 Arrêter la sonnerie</button>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <main id="app">
+
+    <!-- ===================== ACCUEIL ===================== -->
+    <section id="view-home" class="view active" aria-labelledby="homeTitle">
+      <header class="home-head">
+        <p class="brand"><span aria-hidden="true">🍲</span> Assistant Cuisine</p>
+        <h1 id="homeTitle">Qu'est-ce qu'on cuisine aujourd'hui&nbsp;?</h1>
+        <p class="lead">Une recette, des étapes guidées et des minuteurs. Sans inscription.</p>
+      </header>
+
+      <nav class="tiles" aria-label="Choisis ce que tu veux faire">
+        <button type="button" class="tile tile-main" data-mode="prepare">
+          <span class="tile-emoji" aria-hidden="true">🍲</span>
+          <span class="tile-title">Je veux préparer</span>
+          <span class="tile-sub">Un plat précis, pour le nombre de personnes que tu veux</span>
+        </button>
+        <button type="button" class="tile tile-leaf" data-mode="ingredients">
+          <span class="tile-emoji" aria-hidden="true">🧺</span>
+          <span class="tile-title">J'ai des ingrédients</span>
+          <span class="tile-sub">Je te dis ce que tu peux cuisiner</span>
+        </button>
+        <button type="button" class="tile tile-saffron" data-mode="budget">
+          <span class="tile-emoji" aria-hidden="true">💰</span>
+          <span class="tile-title">Petit budget</span>
+          <span class="tile-sub">Des idées selon tes FCFA</span>
+        </button>
+        <button type="button" class="tile tile-pepper" data-mode="rapide">
+          <span class="tile-emoji" aria-hidden="true">⏱️</span>
+          <span class="tile-title">Je suis pressé</span>
+          <span class="tile-sub">Prêt en 10 à 45 minutes</span>
+        </button>
+        <button type="button" class="tile tile-plain" data-mode="plan">
+          <span class="tile-emoji" aria-hidden="true">📅</span>
+          <span class="tile-title">Planifier mes repas</span>
+          <span class="tile-sub">Un programme pour la semaine</span>
+        </button>
+      </nav>
+
+      <button type="button" id="btnFeedback" class="feedback" data-act="feedback">⭐ Donner mon avis</button>
+    </section>
+
+    <!-- ===================== FORMULAIRE DE MODE ===================== -->
+    <section id="view-form" class="view" aria-labelledby="formTitle">
+      <header class="topbar">
+        <button type="button" class="icon-btn" data-act="back" aria-label="Retour">←</button>
+        <h1 id="formTitle">Je veux préparer</h1>
+      </header>
+      <p id="formIntro" class="intro"></p>
+      <form id="modeForm" novalidate>
+        <div id="modeFields"></div>
+        <p id="formError" class="form-error" role="alert" hidden></p>
+        <button type="submit" id="formSubmit" class="btn btn-primary btn-big">Générer la recette</button>
+      </form>
+    </section>
+
+    <!-- ===================== DISCUSSION / RÉSULTATS ===================== -->
+    <section id="view-result" class="view" aria-labelledby="resultTitle">
+      <header class="topbar">
+        <button type="button" class="icon-btn" data-act="back" aria-label="Retour">←</button>
+        <h1 id="resultTitle">Assistant</h1>
+        <button type="button" class="icon-btn" data-act="home" aria-label="Accueil">⌂</button>
+      </header>
+      <div id="thread" class="thread" aria-live="polite"></div>
+      <div class="composer-wrap">
+        <div id="quick" class="quick" hidden>
+          <button type="button" class="chip" data-q="Fais une version moins chère.">Moins cher</button>
+          <button type="button" class="chip" data-q="Fais-le plus épicé.">Plus épicé</button>
+          <button type="button" class="chip" data-q="Je n'aime pas le piment.">Sans piment</button>
+          <button type="button" class="chip" data-q="Fais une version plus rapide.">Plus rapide</button>
+        </div>
+        <form id="composer" class="composer" autocomplete="off">
+          <label class="sr-only" for="composerInput">Ton message</label>
+          <input id="composerInput" type="text" placeholder="Ex : je n'ai pas de beurre…" maxlength="500" enterkeyhint="send">
+          <button type="submit" class="send" aria-label="Envoyer">Envoyer</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===================== MODE CUISINE ===================== -->
+    <section id="view-cook" class="view view-cook" aria-label="Mode cuisine">
+      <div id="cookRoot"></div>
+    </section>
+
+    <!-- ===================== LISTE DE COURSES ===================== -->
+    <section id="view-shopping" class="view" aria-labelledby="shopTitle">
+      <header class="topbar">
+        <button type="button" class="icon-btn" data-act="back" aria-label="Retour">←</button>
+        <h1 id="shopTitle">Liste de courses</h1>
+      </header>
+      <div id="shopRoot"></div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
