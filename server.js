@@ -156,18 +156,25 @@ app.post('/api/ai', async (req, res) => {
 
   try {
     let result = null;
+    let overloaded = false;
+    const wait = ms => new Promise(r => setTimeout(r, ms));
     for (const model of MODELS) {
-      for (let attempt = 0; attempt < 2; attempt++) {
+      for (let attempt = 0; attempt < 3; attempt++) {
         const { status, data } = await callGemini(model, contents);
         if (status === 404) break; // modèle introuvable : on essaie le suivant
         if (status !== 200) {
           const msg = (data && data.error && data.error.message) || '';
-          if (status === 429) return res.status(429).json({ error: "Limite de l'API Gemini atteinte. Réessaie dans un instant." });
           if (status === 400 && /api key/i.test(msg)) return res.status(502).json({ error: 'La clé API Gemini est invalide. Vérifie le fichier .env.' });
           if (status === 403) return res.status(502).json({ error: "Accès refusé par Gemini. Vérifie ta clé API et ses autorisations." });
-          if (status >= 500 && attempt === 0) continue;
+          if (status === 429 || status >= 500) {
+            // Service surchargé ou limite atteinte : petite pause puis nouvel essai, sinon modèle suivant
+            overloaded = true;
+            if (attempt < 2) { await wait(1200 * (attempt + 1)); continue; }
+            break;
+          }
           return res.status(502).json({ error: 'Erreur du service IA (' + status + '). Réessaie.' });
         }
+        overloaded = false;
         const text = (((data.candidates || [])[0] || {}).content || {}).parts;
         const joined = Array.isArray(text) ? text.map(p => p.text || '').join('') : '';
         const parsed = parseJson(joined);
@@ -177,6 +184,9 @@ app.post('/api/ai', async (req, res) => {
         }
       }
       if (result) break;
+    }
+    if (!result && overloaded) {
+      return res.status(503).json({ error: "Le service IA est très sollicité en ce moment. Réessaie dans quelques secondes." });
     }
     if (!result) {
       return res.json({ type: 'chat', message: "Je n'ai pas réussi à préparer une réponse lisible. Peux-tu reformuler ta demande ?" });
